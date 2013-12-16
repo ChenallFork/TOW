@@ -1,8 +1,3 @@
-TOW
-===
-
-Transparent Over the Wall for Tomato/OpenWRT Router 
-
 # TOW (	Transparent Over the Wall )
 
 TOW 是一个安装在 Tomato/OpenWRT 系统上的软件包，安装之后，可以保证连接在这个路由器上的所有客户端透明翻墙。
@@ -22,7 +17,7 @@ TOW 的设计目标是透明化/自动化，理想情况下客户端用户无需
 - 一台能安装 Tomato 或者 OpenWRT 的路由器
 - Tomato/OpenWRT 内含的 iptables/dnsmasq 必须编译支持 ipset
 
-安装：(均以 Tomato 为例）
+# 安装：(均以 Tomato 为例）
 
 准备好 Putty 和 WinSCP 工具；
 
