@@ -2,7 +2,7 @@
 
 TOW 是一个安装在 Tomato/OpenWRT 系统上的软件包，安装之后，可以保证连接在这个路由器上的所有客户端透明翻墙。
 
-当前版本：1.0 [CHANGELOG]
+当前版本：1.0
 
 ## 功能
 
@@ -24,7 +24,7 @@ TOW 的设计目标是透明化/自动化，理想情况下客户端用户无需
 
 如果 Flash 空间足够，启用 JFFS ，格式化后，SSH 登陆路由器：
 
-代码:
+
 ```sh
 cd /jffs
 mkdir opt
@@ -32,25 +32,25 @@ mount -o bind /jffs/opt /opt
 ```
 下载软件包，tow-1.0.tar.gz，用 WinSCP 上传到路由器 tmp 目录，然后执行：
 
-代码:
+
 ```sh
 cd /
-tar xvzf /tmp/tow-kms-1.0-jffs-final.tar.gz
+tar xvzf /tmp/tow-1.0.tar.gz
 ```
 如果 Flash 空间不够，请挂载 U 盘并且在 U 盘上创建 opt 目录，步骤可 Google，例如：
 
-代码:
+
 ```sh
 mount -o bind /mnt/sda1/opt /opt
 cd /
-tar xvzf /tmp/opt-optware-backup.tar.gz
+tar xvzf /tmp/tow-1.0.tar.gz
 cp /opt/.autorun /mnt/sda1/   ###注意这一步不要漏掉，自启动脚本必须放在挂载点根目录
 ```
 请确保 U 盘挂载的分区格式为 ext2/ext3/ext4，optware 不能安装运行在 ntfs 格式上！
 
 pdnsd 内置 114 DNS 服务器解析本地域名，如果对速度不满意，可以修改 /opt/etc/pdnsd.conf 文件第 27 行：
 
-代码:
+
 ```
 	ip = 114.114.114.114,114.114.115.115;
 ```
@@ -60,25 +60,25 @@ pdnsd 内置 114 DNS 服务器解析本地域名，如果对速度不满意，�
 
 1.高级设置-DHCP/DNS-自定义设置：
 
-代码:
+
 ```
 conf-dir=/opt/etc/dnsmasq/custom/
 ```
 2. 系统管理-JFFS-挂载后执行：
 
-代码:
+
 ```
 mount -o bind /jffs/opt /opt
 ```
 如果使用 U 盘，则在：USB and NAS-USB 支持-挂载后运行：
 
-代码:
+
 ```
 mount -o bind /mnt/sda1/opt /opt
 ```
 3. 系统管理-定时重启/连接-自定义(每12小时）：
 
-代码:
+
 ```
 /opt/etc/init.d/S10dnsmasqc
 ```
@@ -87,27 +87,29 @@ mount -o bind /mnt/sda1/opt /opt
 
 再次 SSH 登入路由器，运行：
 
-代码:
+
 ```sh
 netstat -lnp
 ```
 
-应该可以看到 tcp 有 8099 和 7070 端口在监听；udp 有 5454 在监听；
+应该可以看到 tcp 有 8099 和 7070 端口在监听；tcp/udp 有 5454 在监听；
 
 运行：
 
-代码:
+
 ```sh
 iptables -t nat -nvL
 ```
 
 应该看到有 REDSOCKS 或者 SHADOWSOCKS 的 Chian 存在。
 
-给出的软件包默认工作在 `ShadowSocks Redir` + 全子网模式，也就是在路由器子网内所有客户端透明翻墙。
+给出的软件包默认工作在 `ShadowSocks redir` + 全子网模式，也就是在路由器子网内所有客户端透明翻墙。
 
 请修改： `/opt/etc/py/ga/proxy.ini` 填入你自己的 GoAgent 账号。
 
 请修改：`/opt/etc/shadowsocks.json` 文件，填入你自己的服务器地址端口和密码，本地监听端口7070不可改！
+
+请修改： `/opt/etc/config/*.fire` 文件，填入你自己的 `ssh_server` 和 `ss_server` 域名；
 
 # 致谢
 
