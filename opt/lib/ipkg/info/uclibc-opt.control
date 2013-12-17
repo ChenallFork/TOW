@@ -1,0 +1,11 @@
+Package: uclibc-opt
+Architecture: mipsel
+Priority: required
+Section: base
+Version: 0.9.28-13
+Maintainer: leon.kos@amis.net
+Source: /buildroot-svn-17310.tar.gz
+Description: micro C library for embedded Linux systems
+Depends: 
+Suggests: ipkg-opt
+Conflicts: 

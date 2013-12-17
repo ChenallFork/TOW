@@ -1,0 +1,11 @@
+Package: ipkg-opt
+Architecture: mipsel
+Priority: optional
+Section: base
+Version: 0.99.163-10
+Maintainer: NSLU2 Linux <nslu2-linux@yahoogroups.com>
+Source: :pserver:anoncvs@anoncvs.handhelds.org
+Description: The Itsy Package Manager
+Depends: uclibc-opt
+Suggests: 
+Conflicts: 

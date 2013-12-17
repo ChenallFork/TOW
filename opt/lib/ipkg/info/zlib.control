@@ -1,0 +1,10 @@
+Package: zlib
+Architecture: mipsel
+Priority: optional
+Section: libs
+Version: 1.2.5-1
+Maintainer: NSLU2 Linux <nslu2-linux@yahoogroups.com>
+Source: http://downloads.sourceforge.net/sourceforge/libpng/zlib-1.2.5.tar.bz2
+Description: zlib is a library implementing the 'deflate' compression system.
+Depends: 
+Conflicts: 

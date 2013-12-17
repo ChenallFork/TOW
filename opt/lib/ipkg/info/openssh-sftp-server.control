@@ -1,0 +1,11 @@
+Package: openssh-sftp-server
+Architecture: mipsel
+Priority: optional
+Section: net
+Version: 5.9p1-1
+Maintainer: NSLU2 Linux <nslu2-linux@yahoogroups.com>
+Source: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-5.9p1.tar.gz
+Description: sftp-server only from a FREE version of the SSH protocol suite of network connectivity tools.
+Depends: openssl, zlib
+Suggests: 
+Conflicts: 

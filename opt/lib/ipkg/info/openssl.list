@@ -1,0 +1,8 @@
+/opt/share/openssl/openssl.cnf
+/opt/lib/libssl.so
+/opt/lib/libssl.so.0
+/opt/bin/openssl
+/opt/lib/libcrypto.so
+/opt/lib/libssl.so.0.9.7
+/opt/lib/libcrypto.so.0
+/opt/lib/libcrypto.so.0.9.7

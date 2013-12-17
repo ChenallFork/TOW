@@ -1,0 +1,7 @@
+{
+    "server":"ss.youserver.com",
+    "server_port":12345,
+    "local_port":7272,
+    "password":"fuckgfw",
+    "timeout":600
+}

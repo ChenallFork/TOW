@@ -1,0 +1,10 @@
+/opt/bin/update-alternatives
+/opt/lib/libipkg.so
+/opt/lib/libipkg.so.0.0.0
+/opt/etc/ipkg.conf
+/opt/bin/ipkg
+/opt/lib/libipkg.so.0
+/opt/bin/ipkg-opt
+/opt/share/ipkg/intercept/update-modules
+/opt/share/ipkg/intercept/depmod
+/opt/share/ipkg/intercept/ldconfig

@@ -1,0 +1,34 @@
+Package: ipkg-opt
+Version: 0.99.163-10
+Depends: uclibc-opt
+Status: install user installed
+Architecture: mipsel
+
+Package: libevent
+Version: 2.0.20-1
+Status: install user installed
+Architecture: mipsel
+Installed-Time: 1382932649
+
+Package: openssh-sftp-server
+Version: 5.9p1-1
+Depends: openssl, zlib
+Status: install user installed
+Architecture: mipsel
+
+Package: openssl
+Version: 0.9.7m-6
+Status: install ok installed
+Architecture: mipsel
+
+Package: uclibc-opt
+Version: 0.9.28-13
+Suggests: ipkg-opt
+Status: install user installed
+Architecture: mipsel
+
+Package: zlib
+Version: 1.2.5-1
+Status: install ok installed
+Architecture: mipsel
+
