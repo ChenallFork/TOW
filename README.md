@@ -30,7 +30,7 @@ cd /jffs
 mkdir opt
 mount -o bind /jffs/opt /opt
 ```
-下载软件包，tow-1.0.tar.gz，用 WinSCP 上传到路由器 tmp 目录，然后执行：
+下载软件包，[tow-1.0.tar.gz](https://dl.dropboxusercontent.com/u/200370/Router/%21unique4g/backup/tow-1.0.tar.gz)，用 WinSCP 上传到路由器 tmp 目录，然后执行：
 
 
 ```sh
