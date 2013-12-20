@@ -107,9 +107,54 @@ iptables -t nat -nvL
 
 请修改： `/opt/etc/py/ga/proxy.ini` 填入你自己的 GoAgent 账号。
 
-请修改：`/opt/etc/shadowsocks.json` 文件，填入你自己的服务器地址端口和密码，本地监听端口7070不可改！
+请修改：`/opt/etc/shadowsocks.json`, `/opt/etc/shadowsocks_redir.json`文件，填入你自己的服务器地址端口和密码，本地监听端口`7070/7272`不可改！
 
 请修改： `/opt/etc/config/*.fire` 文件，填入你自己的 `ssh_server` 和 `ss_server` 域名；
+
+请修改： `/opt/etc/init.d/S27obssh` 文件，填入 SSH 登录信息
+
+# 流程以及文件解析
+
+### 自启动以及防火墙
+
+关键目录和文件：`/opt/.autorun`, `/opt/etc/config`。
+
+`/opt/.autorun` 文件利用了 Tomato Optware 的特点：在任何挂载设备根目录下如果存在 `.autorun` 结尾的文件,则在挂载此设备后执行该文件。`.autorun` 文件代码：
+```sh
+if [ -f /var/notice/wan ]; then
+   for s in /opt/etc/config/*.wanup; do $s; done
+   for s in /opt/etc/config/*.fire; do $s; done
+fi
+```
+表示在 WAN 上线后，运行 `/opt/etc/config` 下所有以 `wanup` 和 `fire` 为后缀的文件。
+
+`*.fire` 为防火墙脚本，和 Tomato 图形界面中设置防火墙脚本作用是一样的。这个脚本在 TOW 方案中极为重要，可以仔细阅读一下源代码；
+
+`*.wanup` 为自启动程序列表，所需的主要程序 shadowsocks，redsocks 等都由这个文件调用启动。
+
+### DNS 处理
+
+关键目录和文件： `/opt/etc/dnsmasq`
+
+...待完成...
+
+### 程序的启动/停止/重启以及监控
+
+关键目录和文件： `/opt/etc/init.d` 下 S 开头的文件
+
+...待完成...
+
+### 程序配置文件
+
+关键目录和文件： `/opt/etc` 以及 `/opt/etc/init.d/S27obssh`
+
+...待完成...
+
+### 手动维护 ipset 的 gfwlist 列表
+
+关键文件： `/opt/etc/init.d` 下 dmadd, dmdel, dmcheck 三个文件
+
+...待完成...
 
 # 致谢
 
