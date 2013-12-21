@@ -34,7 +34,7 @@ restart)
         ${BINPATH}ss-local $CONF &
     elif [ -n "`pidof ss-redir`" ]; then
         killall ss-redir
-        ${BINPATH}ss-redir $CONF &
+        ${BINPATH}ss-redir $CONF_REDIR &
     else
         elog "Neither ss-local nor ss-redir running, start ss-local instead!"
         ${BINPATH}ss-local $CONF &
