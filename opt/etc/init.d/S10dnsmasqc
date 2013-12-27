@@ -34,6 +34,7 @@ tunlr() {
 }
 
 gfwlist() {
+	local GLF="/opt/etc/dnsmasq/custom/gfwlist.cfg"
     cd /tmp
     wget -q --no-check-certificate https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt -O gfwlist.txt
     base64 -d gfwlist.txt > gfwlist.dec     #Base64 decode
@@ -79,22 +80,22 @@ gfwlist() {
     rm domainlist.tmp
     rm domainlist.special
     rm gfwlist.*
-    mv -f /tmp/domainlist.txt /opt/etc/dnsmasq/custom/gfwlist.cfg
+    mv -f /tmp/domainlist.txt $GLF
     #lanternlist
     local TMPLISTFILE="/tmp/lanternlist.txt"
-    local gfwlistFILE="/opt/etc/dnsmasq/custom/gfwlist.cfg"
     wget -q --no-check-certificate https://raw.github.com/getlantern/lantern-proxied-sites-lists/master/china/autoproxy/list.txt -O $TMPLISTFILE
     echo 'Converting lanternlist to domain list...'
     sed -i '1,10d' $TMPLISTFILE
     sed -i "s/.*/ipset=\/&\/gfwlist/" $TMPLISTFILE
-    [ -e $gfwlistFILE ] && cat $TMPLISTFILE >> $gfwlistFILE
-    sort $gfwlistFILE | uniq > $TMPLISTFILE
-    mv -f $TMPLISTFILE $gfwlistFILE
-    sed -i '1s/^.*$/#### GFWList Domain for IPSET ####/' $gfwlistFILE
+    [ -e $GLF ] && cat $TMPLISTFILE >> $GLF
+    sort $GLF| uniq > $TMPLISTFILE
+    mv -f $TMPLISTFILE $GLF
+    sed -i '1s/^.*$/#### GFWList Domain for IPSET ####/' $GLF
     echo 'done.'
 }
 
 whitelist() {
+	local WLF="/opt/etc/dnsmasq/custom/whitelist.cfg"
     cd /tmp
     wget -q --no-check-certificate https://github.com/n0wa11/gfw_whitelist/raw/master/whitelist.pac -O whitelist.txt
     sed -i 's/ //g' whitelist.txt        #remove all space
@@ -107,10 +108,9 @@ whitelist() {
     sort whitelist.tmp | uniq > dnswhitelist.txt
     sed -i -e "s/.*/ipset=\/&\/whitelist/" dnswhitelist.txt
     rm whitelist.*
-    mv -f /tmp/dnswhitelist.txt /opt/etc/dnsmasq/custom/whitelist.cfg
+    mv -f /tmp/dnswhitelist.txt $WLF
     #pandalist
     local TMPLISTFILE="/tmp/panda_list.txt"
-    local whitelistFILE="/opt/etc/dnsmasq/custom/whitelist.cfg"
     wget -q --no-check-certificate -O $TMPLISTFILE https://www.pandafan.org/pac/domain_list.txt
     echo 'Converting pandalist to domain list...'
     sed -i 's/\[//g' $TMPLISTFILE
@@ -118,17 +118,17 @@ whitelist() {
     sed -i 's/, /\n/g' $TMPLISTFILE
     sed -i "s/'//g" $TMPLISTFILE
     sed -i "s/.*/ipset=\/&\/whitelist/" $TMPLISTFILE
-    [ -e $whitelistFILE ] && cat $TMPLISTFILE >> $whitelistFILE
-    sort $whitelistFILE | uniq > $TMPLISTFILE
-    mv -f $TMPLISTFILE $whitelistFILE
-    sed -i '1 i\###China Domain WhiteList for IPSET###' $whitelistFILE
+    [ -e $WLF ] && cat $TMPLISTFILE >> $WLF
+    sort $WLF | uniq > $TMPLISTFILE
+    mv -f $TMPLISTFILE $WLF
+    sed -i '1 i\###China Domain WhiteList for IPSET###' $WLF
     [ -e $TMPLISTFILE ] && rm -f $TMPLISTFILE
     echo 'done.'
 }
 
 tunlr
 gfwlist
-#whitelist
+whitelist
 
 if [ $SHR -eq 1 ]
     then

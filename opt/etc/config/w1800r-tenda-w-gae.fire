@@ -2,10 +2,13 @@
 
 alias elog='logger -t IPT -s'
 alias ping='/bin/ping'
-use_gfwlist=1
+
+use_gfwlist=0
+use_whitelist=1
+ipset_whitelist_force_recreate=0
 ipset_gfwlist_force_recreate=0
-ssh_server="ssh.server.org"
-ss_server="pp.shadowsocks.com"
+ssh_server="ssh.wendangku.org"
+ss_server="p1.5bird.com"
 
 # Loading ipset modules
 if [ $(lsmod | grep "ipt_set" | wc -l) -eq 0 ]; then
@@ -57,8 +60,7 @@ ipt() {
 
     # Mode select paramete
     [ "$1" = "redir" ] && REDIRECTOR="SHADOWSOCKS" || REDIRECTOR="REDSOCKS"
-    [ "$1" = "ssh" ] && \
-    serverdomain="$ssh_server" || serverdomain="$ss_server"
+    [ "$1" = "ssh" ] && serverdomain="$ssh_server" || serverdomain="$ss_server"
 
     # Create new chain
     iptables -t nat -N $REDIRECTOR
@@ -78,7 +80,7 @@ ipt() {
     iptables -t nat -A $REDIRECTOR -d 240.0.0.0/4 -j RETURN
     iptables -t nat -A $REDIRECTOR -d "$remoteip" -j RETURN
 
-    if [ $use_gfwlist -eq 0 ]; then
+    if [ $use_gfwlist -eq 0 -a $use_whitelist -eq 0]; then
     # Anything else should be redirected to $REDIRECTOR's local port
         iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI -j DNAT --to-destination $DEST
     fi
@@ -92,7 +94,7 @@ ipt() {
             ipset -F gfwlist
             ipset -X gfwlist
             sleep 3
-            ipset -N ipset -N gfwlist iphash
+            ipset -N gfwlist iphash
             elog "ipset gfwlist recreate success."
         }
         if [ "$1" = "gae" ]; then
@@ -103,10 +105,30 @@ ipt() {
         fi
     fi
 
+    #use whitelist
+    if [ $use_whitelist -eq 1 ]; then
+        checkwhitelist=$(ipset -L whitelist 2> /dev/null | wc -l)
+        [ $checkwhitelist -eq 0 ] && ipset -N whitelist iphash
+        [ $ipset_whitelist_force_recreate -eq 1 ] && {
+            elog "Force whitelist recreating..."
+            ipset -F whitelist
+            ipset -X whitelist
+            sleep 3
+            ipset -N whitelist iphash
+            elog "ipset whitelist recreate success."
+        }
+        if [ "$1" = "gae" ]; then
+            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination $DEST
+            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI --dport 443 -m set ! --set whitelist dst -j DNAT --to-destination $DESTS
+        else
+            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI -m set ! --set whitelist dst -j DNAT --to-destination $DEST
+        fi
+    fi
+
     # Apply the rules
     iptables -t nat -A PREROUTING -i `nvram get lan_ifname` -p tcp -j $REDIRECTOR
 }
 
 #iptstart
-ipt redir 8 50
+ipt ssh 8 50
 #iptend
