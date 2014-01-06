@@ -1,10 +1,9 @@
 #!/bin/sh
 BIN=GoAgent
-LBIN=python2.7
+LBIN="/opt/bin/python2.7"
 SFILE="/opt/etc/py/ga/proxy.py"
 PID_F="/var/run/${BIN}.pid"
 alias elog="logger -t $BIN -s"
-alias kill="/bin/kill"
 COND=$1
 [ $# -eq 0 ] && COND="start"
 
@@ -15,8 +14,12 @@ do_start() {
     else
         elog "Starting $BIN... "
         nohup $LBIN $SFILE > /dev/null 2>&1 &
-        [ "$?" != "0" ] && elog "$0 - $BIN startup failed" || \
-        echo $! > $PID_F
+        if [ "$?" != "0" ]; then
+			elog "$0 - $BIN startup failed"
+		else
+			echo $! > $PID_F
+			elog "$BIN startup Success"
+		fi
     fi
 }
 
@@ -33,7 +36,7 @@ do_stop() {
 
 do_watchdog() {
     ct=`netstat -ln | grep "8086" | wc -l`
-    while [ "$ct" -ne "1" ]
+    while [ $ct -ne 1 ]
     do
         elog "$BIN stopped abnormal, try to restart it..."
         elog "Restarting $BIN... "
@@ -52,7 +55,7 @@ start)
 stop)
     do_stop
     ;;
-dog)
+watchdog)
     do_watchdog
     ;;
 restart)
@@ -62,6 +65,6 @@ restart)
     do_start
     ;;
 *)
-  elog "Usage: $0 (start|stop|restart|dog)"
+  elog "Usage: $0 (start|stop|restart|watchdog)"
   exit 1
 esac

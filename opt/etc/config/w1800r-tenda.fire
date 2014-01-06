@@ -31,8 +31,7 @@ ipt() {
         RSPORT=7272
         ;;
     gae)
-        RSPORT=8096
-        RSPORTS=8097
+        RSPORT=8087
         ;;
     ssh)
         RSPORT=8098
@@ -48,7 +47,6 @@ ipt() {
 
     #Define Ports
     DEST="`nvram get lan_ipaddr`:${RSPORT}"
-    [ "$1" = "gae" ] && DESTS="`nvram get lan_ipaddr`:${RSPORTS}"
 
     # redirect all subnet or some ips only
     if [ $# -eq 1 ]; then
@@ -82,7 +80,7 @@ ipt() {
 
     if [ $use_gfwlist -eq 0 -a $use_whitelist -eq 0]; then
     # Anything else should be redirected to $REDIRECTOR's local port
-        iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI -j DNAT --to-destination $DEST
+        iptables -t nat -A $REDIRECTOR -p tcp -j DNAT --to-destination $DEST
     fi
 
     #use gfwlist
@@ -98,10 +96,9 @@ ipt() {
             elog "ipset gfwlist recreate success."
         }
         if [ "$1" = "gae" ]; then
-            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI --dport 80 -m set --set gfwlist dst -j DNAT --to-destination $DEST
-            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI --dport 443 -m set --set gfwlist dst -j DNAT --to-destination $DESTS
+            iptables -t nat -A $REDIRECTOR -p tcp --dport 80 -m set --set gfwlist dst -j DNAT --to-destination $DEST
         else
-            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI -m set --set gfwlist dst -j DNAT --to-destination $DEST
+            iptables -t nat -A $REDIRECTOR -p tcp -m set --set gfwlist dst -j DNAT --to-destination $DEST
         fi
     fi
 
@@ -118,15 +115,14 @@ ipt() {
             elog "ipset whitelist recreate success."
         }
         if [ "$1" = "gae" ]; then
-            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination $DEST
-            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI --dport 443 -m set ! --set whitelist dst -j DNAT --to-destination $DESTS
+            iptables -t nat -A $REDIRECTOR -p tcp --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination $DEST
         else
-            iptables -t nat -A $REDIRECTOR -p tcp $SOUCLI -m set ! --set whitelist dst -j DNAT --to-destination $DEST
+            iptables -t nat -A $REDIRECTOR -p tcp -m set ! --set whitelist dst -j DNAT --to-destination $DEST
         fi
     fi
 
     # Apply the rules
-    iptables -t nat -A PREROUTING -i `nvram get lan_ifname` -p tcp -j $REDIRECTOR
+    iptables -t nat -A PREROUTING -i `nvram get lan_ifname` -p tcp $SOUCLI -j $REDIRECTOR
 }
 
 #iptstart

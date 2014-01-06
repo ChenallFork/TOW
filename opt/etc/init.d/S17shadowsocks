@@ -13,8 +13,8 @@ COND=$1
 case $COND in
 stop)
     elog "Stopping $BIN... "
-    [ -n "`pidof ss-redir`" ] && { killall ss-redir; elog "ss-redir Stopped. "; }
-    [ -n "`pidof ss-local`" ] && { killall ss-local; elog "ss-local Stopped. "; }
+    [ -n "`pidof ss-redir`" ] && { killall ss-redir; rm $PID_F; elog "ss-redir Stopped. "; }
+    [ -n "`pidof ss-local`" ] && { killall ss-local; rm $PID_REDIR; elog "ss-local Stopped. "; }
     ;;
 start)
     elog "Starting ss-local... "
@@ -23,23 +23,28 @@ start)
         elog "ss-local already running!"
     else
         ${BINPATH}ss-local $CONF &
-        elog "ss-local Started. "
+        [ "$?" = "0" ] && elog "ss-local start success. " || elog "ss-local start failed. "
     fi
     ;;
 restart)
     elog "Restarting $BIN... "
     [ ! -d $RUN_D ] && mkdir -p $RUN_D
     if [ -n "`pidof ss-local`" ]; then
-            killall ss-local
+		killall ss-local
+		rm $PID_F
         ${BINPATH}ss-local $CONF &
-    elif [ -n "`pidof ss-redir`" ]; then
+	fi
+    if [ -n "`pidof ss-redir`" ]; then
         killall ss-redir
+        rm $PID_REDIR
         ${BINPATH}ss-redir $CONF_REDIR &
-    else
-        elog "Neither ss-local nor ss-redir running, start ss-local instead!"
+	fi
+    if [ -z "`pidof ss-redir`" -a -z "`pidof ss-local`" ]; then
+        elog "Neither ss-local nor ss-redir running, start both!"
         ${BINPATH}ss-local $CONF &
+        ${BINPATH}ss-redir $CONF_REDIR &
     fi
-    elog "$BIN Restart Success. "
+    [ "$?" = "0" ] && elog "$BIN restart success. " || elog "$BIN restart failed. "
     ;;
 redir)
     elog "$BIN redir mode! "
@@ -48,7 +53,7 @@ redir)
         elog "ss-redir already running!"
     else
         ${BINPATH}ss-redir $CONF_REDIR &
-        elog "ss-redir Started. "
+        [ "$?" = "0" ] && elog "ss-redir start success. " || elog "ss-redir start failed. "
     fi
     ;;
 *)

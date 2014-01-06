@@ -1,6 +1,6 @@
 #!/bin/sh
 BIN=KMS
-LBIN=python2.7
+LBIN="/opt/bin/python2.7"
 SFILE="/opt/etc/py/kms/server.py"
 PID_F="/var/run/${BIN}.pid"
 alias elog="logger -t $BIN -s"
@@ -32,7 +32,7 @@ do_stop() {
 
 do_watchdog() {
     ct=`netstat -ln | grep "1688" | wc -l`
-    while [ "$ct" -ne "1" ]
+    while [ $ct -ne 1 ]
     do
         elog "$BIN stopped abnormal, try to restart it..."
         elog "Restarting $BIN... "
