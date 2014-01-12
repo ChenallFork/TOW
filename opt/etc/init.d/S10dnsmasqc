@@ -18,7 +18,7 @@ tunlr() {
         | sed "s/\"dns.\"://g" | sed "s/[{}]//g" | sed "s/,/\ /g" |sed "s/\"//g")
     if [ -z "$IPS" ] || [ -n "$(echo $IPS | sed 's/[0-9\.\ ]//g')" ] ; then
         echo "Tunlr DNS addresses not retrieved, exiting."
-        exit
+        return
     fi
     echo -n > $DNSMASQ_CONF
     echo "# Tunlr DNS updater for dnsmasq" >> $DNSMASQ_CONF
