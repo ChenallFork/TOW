@@ -3,12 +3,15 @@
 alias elog='logger -t IPT -s'
 alias ping='/bin/ping'
 
-use_gfwlist=0
-use_whitelist=1
+use_gfwlist=1
+use_whitelist=0
+use_http_gae=1
+
 ipset_whitelist_force_recreate=0
 ipset_gfwlist_force_recreate=0
+
 ssh_server="ssh.wendangku.org"
-ss_server="p1.5bird.com"
+ss_server="p3.5bird.com"
 
 # Loading ipset modules
 if [ $(lsmod | grep "ipt_set" | wc -l) -eq 0 ]; then
@@ -36,17 +39,21 @@ ipt() {
     ssh)
         RSPORT=8098
         ;;
+    web)
+        RSPORT=8095
+        ;;
     off)
         elog "iptables for proxy were clear."
         exit 1
         ;;
     *)
-        echo "Usage: $0 {ss|redir|gae|ssh|off}"
+        echo "Usage: $0 {ss|redir|gae|ssh|web|off}"
         exit 1
     esac
 
     #Define Ports
     DEST="`nvram get lan_ipaddr`:${RSPORT}"
+    DEST_GAE="`nvram get lan_ipaddr`:8087"
 
     # redirect all subnet or some ips only
     if [ $# -eq 1 ]; then
@@ -61,6 +68,7 @@ ipt() {
     [ "$1" = "ssh" ] && serverdomain="$ssh_server" || serverdomain="$ss_server"
 
     # Create new chain
+    iptables -t nat -X $REDIRECTOR
     iptables -t nat -N $REDIRECTOR
 
     # Ignore your proxy server's addresses
@@ -76,7 +84,8 @@ ipt() {
     iptables -t nat -A $REDIRECTOR -d 192.168.0.0/16 -j RETURN
     iptables -t nat -A $REDIRECTOR -d 224.0.0.0/4 -j RETURN
     iptables -t nat -A $REDIRECTOR -d 240.0.0.0/4 -j RETURN
-    iptables -t nat -A $REDIRECTOR -d "$remoteip" -j RETURN
+
+	[ "$1" != "gae" ] && iptables -t nat -A $REDIRECTOR -d "$remoteip" -j RETURN
 
     if [ $use_gfwlist -eq 0 -a $use_whitelist -eq 0]; then
     # Anything else should be redirected to $REDIRECTOR's local port
@@ -95,11 +104,10 @@ ipt() {
             ipset -N gfwlist iphash
             elog "ipset gfwlist recreate success."
         }
-        if [ "$1" = "gae" ]; then
-            iptables -t nat -A $REDIRECTOR -p tcp --dport 80 -m set --set gfwlist dst -j DNAT --to-destination $DEST
-        else
-            iptables -t nat -A $REDIRECTOR -p tcp -m set --set gfwlist dst -j DNAT --to-destination $DEST
-        fi
+        if [ "$use_http_gae" = "1" -a "$1" != "gae" ]; then
+            iptables -t nat -A $REDIRECTOR -p tcp --dport 80 -m set --set gfwlist dst -j DNAT --to-destination $DEST_GAE
+		fi
+			iptables -t nat -A $REDIRECTOR -p tcp -m set --set gfwlist dst -j DNAT --to-destination $DEST
     fi
 
     #use whitelist
@@ -114,17 +122,17 @@ ipt() {
             ipset -N whitelist iphash
             elog "ipset whitelist recreate success."
         }
-        if [ "$1" = "gae" ]; then
-            iptables -t nat -A $REDIRECTOR -p tcp --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination $DEST
-        else
-            iptables -t nat -A $REDIRECTOR -p tcp -m set ! --set whitelist dst -j DNAT --to-destination $DEST
-        fi
+        if [ "$use_http_gae" = "1" -a "$1" != "gae" ]; then
+            iptables -t nat -A $REDIRECTOR -p tcp --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination $DEST_GAE
+		fi
+		iptables -t nat -A $REDIRECTOR -p tcp -m set ! --set whitelist dst -j DNAT --to-destination $DEST
     fi
 
     # Apply the rules
     iptables -t nat -A PREROUTING -i `nvram get lan_ifname` -p tcp $SOUCLI -j $REDIRECTOR
+    #iptables -t nat -A OUTPUT 1 -p tcp $SOUCLI -j $REDIRECTOR
 }
 
 #iptstart
-ipt ssh 8 50
+ipt redir
 #iptend
