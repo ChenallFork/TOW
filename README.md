@@ -9,7 +9,7 @@ TOW 是一个安装在 Tomato/OpenWRT 系统上的软件包，安装之后，可
 TOW 的设计目标是透明化/自动化，理想情况下客户端用户无需关心哪些网站无法访问，可直连网站也不会因为使用二级代理而降低访问速度。
 
 - 使用 pdnsd 特性防止 DNS 污染
-- 支持 GoAgent, SOCKS5, [shadowsocks](https://github.com/clowwindy/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E) 和 Obfuscated ssh 等代理服务器
+- 支持 GoAgent, SOCKS5, [shadowsocks](https://github.com/clowwindy/shadowsocks/wiki/Shadowsocks-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E) 和 Obfuscated ssh，WebVPN 等代理服务器
 - 使用 gfwlist 和 ipset 配合 iptables 处理被墙网站，仅对被墙网站使用代理
 
 # 依赖
